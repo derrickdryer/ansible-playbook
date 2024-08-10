@@ -1,3 +1,4 @@
+# Based on https://github.com/Gatsby-Lee/moon-rapi/blob/main/ansible_playbook/install-docker-on-rpios-bookworm.yaml
 - name: Install Docker Engine on Raspberry Pi OS - Bookworm
   hosts: all
   become: true
