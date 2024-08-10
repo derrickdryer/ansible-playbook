@@ -1,0 +1,70 @@
+- name: Deploy Portainer and Watchtower
+  hosts: hephaestus-1.local.wabbitnet.xyz
+  become: true
+  tasks:
+    - name: Delete portainer if present
+      community.docker.docker_container:
+        name: portainer
+        state: absent
+
+    - name: Delete portainer volumes
+      community.docker.docker_volume:
+        name: portainer_data
+        state: absent
+
+    - name: Delete watchtower if present
+      community.docker.docker_container:
+        name: watchtower
+        state: absent
+
+    - name: Deploy Portainer
+      community.docker.docker_container:
+        name: portainer
+        image: portainer/portainer-ce:2.20.3
+        ports:
+          - 8000:8000
+          - 9443:9443
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
+        restart_policy: always
+
+    - name: Deploy Watchtower
+      community.docker.docker_container:
+        name: watchtower
+        image: containrrr/watchtower
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        restart_policy: always
+
+- name: Deploy portainer agent on other server
+  hosts: hephaestus-2.local.wabbitnet.xyz
+  become: true
+  tasks:
+    - name: Delete portainer agent if present
+      community.docker.docker_container:
+        name: portainer-agent
+        state: absent
+
+    - name: Delete watchtower if present
+      community.docker.docker_container:
+        name: watchtower
+        state: absent
+
+    - name: Deploy Portainer Agent
+      community.docker.docker_container:
+        name: portainer-agent
+        image: portainer/agent:2.20.3
+        ports:
+          - 9001:9001
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        restart_policy: always
+
+    - name: Deploy Watchtower
+      community.docker.docker_container:
+        name: watchtower
+        image: containrrr/watchtower
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        restart_policy: always

@@ -2,8 +2,8 @@
 - name: Install Docker Engine on Raspberry Pi OS - Bookworm
   hosts: all
   become: true
-  vars:
-    current_user: "{{ lookup('env', 'USER') }}"
+  #  vars:
+  #    current_user: "{{ lookup('env', 'USER') }}"
   tasks:
     - name: Perform an apt update
       ansible.builtin.apt:
@@ -48,8 +48,10 @@
 
     - name: Add current user to Docker group
       ansible.builtin.user:
-        name: "{{ current_user }}"
+        name: "{{ ansible_user }}"
         groups: docker
+        state: present
+        append: true
 
     - name: Start Docker service
       ansible.builtin.service:
